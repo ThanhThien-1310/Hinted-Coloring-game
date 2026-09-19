@@ -16,8 +16,13 @@
 }
 
 .app-header {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  position: relative;
 
   h1 {
     font-size: 3rem;
@@ -25,6 +30,16 @@
     color: #4f46e5;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     margin: 0;
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }
 
