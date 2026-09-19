@@ -1,10 +1,26 @@
 <main class="app-container">
-  <header class="app-header" style="position: relative;">
+  <header class="app-header" style="position: relative; display: flex; align-items: center; justify-content: center;">
     <h1>{{ currentLanguage() === 'vi' ? 'Màu Sắc' : 'Colors' }}</h1>
-    <button class="lang-toggle-btn" (click)="toggleLanguage()"
-      style="position: absolute; right: 0; top: 0; padding: 8px 16px; border-radius: 99px; border: 2px solid #4f46e5; background: white; color: #4f46e5; font-weight: bold; cursor: pointer;">
-      {{ currentLanguage() === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English' }}
-    </button>
+    
+    <div style="position: absolute; right: 0; top: 0; display: flex; gap: 10px; align-items: center; padding: 10px;">
+      <button class="icon-btn" (click)="exportProgress()" *ngIf="hasCanvasImage()"
+        style="padding: 8px; border-radius: 50%; border: 2px solid #10b981; background: white; color: #10b981; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: 1.2rem; transition: all 0.2s;"
+        [title]="currentLanguage() === 'vi' ? 'Lưu tiến độ' : 'Save Progress'">
+        💾
+      </button>
+      
+      <label for="headerImportUpload" class="icon-btn"
+        style="padding: 8px; border-radius: 50%; border: 2px solid #f59e0b; background: white; color: #f59e0b; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: 1.2rem; margin: 0; transition: all 0.2s;"
+        [title]="currentLanguage() === 'vi' ? 'Nhập tiến độ' : 'Import Progress'">
+        📥
+      </label>
+      <input type="file" id="headerImportUpload" accept=".json" (change)="onImportProgress($event)" hidden>
+
+      <button class="lang-toggle-btn" (click)="toggleLanguage()"
+        style="padding: 8px 16px; border-radius: 99px; border: 2px solid #4f46e5; background: white; color: #4f46e5; font-weight: bold; cursor: pointer;">
+        {{ currentLanguage() === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English' }}
+      </button>
+    </div>
   </header>
 
   <div class="game-board">
@@ -49,12 +65,8 @@
             <label for="singleUpload" class="upload-btn" style="font-size: 1.2rem; padding: 1rem 2rem;">
               📁 {{ currentLanguage() === 'vi' ? 'Tải ảnh mới' : 'New Image' }}
             </label>
-            <label for="importUpload" class="upload-btn" style="font-size: 1.2rem; padding: 1rem 2rem; background-color: #10b981;">
-              📥 {{ currentLanguage() === 'vi' ? 'Nhập tiến độ (JSON)' : 'Import Progress' }}
-            </label>
           </div>
           <input type="file" id="singleUpload" accept="image/*" (change)="onSingleUpload($event)" hidden>
-          <input type="file" id="importUpload" accept=".json" (change)="onImportProgress($event)" hidden>
         </div>
       </div>
 
@@ -66,17 +78,6 @@
           [style.cursor]="history().length === 0 ? 'not-allowed' : 'pointer'">
           ↩️ {{ currentLanguage() === 'vi' ? 'Hoàn tác' : 'Undo' }}
         </button>
-
-        <button class="change-img-btn" (click)="exportProgress()"
-          style="padding: 0.5rem 1.5rem; border-radius: 99px; font-weight: bold; cursor: pointer; border: none; background: #10b981; color: white; transition: all 0.2s;">
-          💾 {{ currentLanguage() === 'vi' ? 'Lưu tiến độ' : 'Save Progress' }}
-        </button>
-
-        <label for="importUploadBar" class="change-img-btn"
-          style="padding: 0.5rem 1.5rem; border-radius: 99px; font-weight: bold; cursor: pointer; border: none; background: #f59e0b; color: white; transition: all 0.2s; display: inline-block;">
-          📥 {{ currentLanguage() === 'vi' ? 'Nhập tiến độ' : 'Import' }}
-        </label>
-        <input type="file" id="importUploadBar" accept=".json" (change)="onImportProgress($event)" hidden>
 
         <button class="change-img-btn" (click)="triggerUpload()"
           style="padding: 0.5rem 1.5rem; border-radius: 99px; font-weight: bold; cursor: pointer; border: none; background: #4f46e5; color: white; transition: all 0.2s;">
