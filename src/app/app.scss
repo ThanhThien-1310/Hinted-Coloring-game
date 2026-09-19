@@ -16,13 +16,9 @@
 }
 
 .app-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
   position: relative;
+  margin-bottom: 2rem;
+  text-align: center;
 
   h1 {
     font-size: 3rem;
@@ -30,8 +26,6 @@
     color: #4f46e5;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     margin: 0;
-    flex-grow: 1;
-    text-align: center;
   }
 
   .header-actions {
@@ -40,6 +34,19 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+}
+
+@media (min-width: 850px) {
+  .app-header {
+    .header-actions {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-top: 0;
+    }
   }
 }
 
