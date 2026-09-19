@@ -45,21 +45,39 @@
             {{ currentLanguage() === 'vi' ? 'Hệ thống sẽ tự động tạo hình nét và trích xuất bảng màu từ ảnh của bạn!' :
             'System will automatically generate line art and extract colors from your image!' }}
           </p>
-          <label for="singleUpload" class="upload-btn" style="font-size: 1.2rem; padding: 1rem 2rem;">
-            📁 {{ currentLanguage() === 'vi' ? 'Tải ảnh của bạn lên' : 'Upload your image' }}
-          </label>
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <label for="singleUpload" class="upload-btn" style="font-size: 1.2rem; padding: 1rem 2rem;">
+              📁 {{ currentLanguage() === 'vi' ? 'Tải ảnh mới' : 'New Image' }}
+            </label>
+            <label for="importUpload" class="upload-btn" style="font-size: 1.2rem; padding: 1rem 2rem; background-color: #10b981;">
+              📥 {{ currentLanguage() === 'vi' ? 'Nhập tiến độ (JSON)' : 'Import Progress' }}
+            </label>
+          </div>
           <input type="file" id="singleUpload" accept="image/*" (change)="onSingleUpload($event)" hidden>
+          <input type="file" id="importUpload" accept=".json" (change)="onImportProgress($event)" hidden>
         </div>
       </div>
 
       <div class="action-bar" *ngIf="hasCanvasImage()"
-        style="margin-top: 1rem; text-align: center; display: flex; justify-content: center; gap: 10px;">
+        style="margin-top: 1rem; text-align: center; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
         <button class="undo-btn" (click)="undo()" [disabled]="history().length === 0"
           style="padding: 0.5rem 1.5rem; border-radius: 99px; font-weight: bold; cursor: pointer; border: none; background: #e5e7eb; color: #4b5563; transition: all 0.2s;"
           [style.opacity]="history().length === 0 ? '0.5' : '1'"
           [style.cursor]="history().length === 0 ? 'not-allowed' : 'pointer'">
           ↩️ {{ currentLanguage() === 'vi' ? 'Hoàn tác' : 'Undo' }}
         </button>
+
+        <button class="change-img-btn" (click)="exportProgress()"
+          style="padding: 0.5rem 1.5rem; border-radius: 99px; font-weight: bold; cursor: pointer; border: none; background: #10b981; color: white; transition: all 0.2s;">
+          💾 {{ currentLanguage() === 'vi' ? 'Lưu tiến độ' : 'Save Progress' }}
+        </button>
+
+        <label for="importUploadBar" class="change-img-btn"
+          style="padding: 0.5rem 1.5rem; border-radius: 99px; font-weight: bold; cursor: pointer; border: none; background: #f59e0b; color: white; transition: all 0.2s; display: inline-block;">
+          📥 {{ currentLanguage() === 'vi' ? 'Nhập tiến độ' : 'Import' }}
+        </label>
+        <input type="file" id="importUploadBar" accept=".json" (change)="onImportProgress($event)" hidden>
+
         <button class="change-img-btn" (click)="triggerUpload()"
           style="padding: 0.5rem 1.5rem; border-radius: 99px; font-weight: bold; cursor: pointer; border: none; background: #4f46e5; color: white; transition: all 0.2s;">
           📷 {{ currentLanguage() === 'vi' ? 'Đổi ảnh khác' : 'Change Image' }}

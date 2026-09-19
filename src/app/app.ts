@@ -429,6 +429,78 @@ export class App implements OnInit, OnDestroy {
     input.value = '';
   }
 
+  public exportProgress() {
+    if (!this.hasCanvasImage()) return;
+
+    const fileName = prompt(this.currentLanguage() === 'vi' ? 'Nhập tên file để lưu tiến độ:' : 'Enter file name to save progress:', 'tien-do-to-mau');
+    if (!fileName) return;
+
+    const canvas = this.canvasRef.nativeElement;
+    const currentCanvasUrl = canvas.toDataURL('image/png');
+
+    const progressData = {
+      originalImage: this.sampleImageUrl(),
+      currentCanvas: currentCanvasUrl
+    };
+
+    const jsonString = JSON.stringify(progressData);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  public onImportProgress(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const data = JSON.parse(content);
+          
+          if (!data.originalImage || !data.currentCanvas) {
+            alert(this.currentLanguage() === 'vi' ? 'File tiến độ không hợp lệ!' : 'Invalid progress file!');
+            return;
+          }
+
+          this.sampleImageUrl.set(data.originalImage);
+          this.isCompleted.set(false);
+
+          const img = new Image();
+          img.onload = () => {
+            this.processImage(img);
+            
+            // Đợi processImage hoàn tất và đè hình cũ lên
+            setTimeout(() => {
+              const progressImg = new Image();
+              progressImg.onload = () => {
+                const canvas = this.canvasRef.nativeElement;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                   ctx.clearRect(0, 0, canvas.width, canvas.height);
+                   ctx.drawImage(progressImg, 0, 0);
+                   this.history.set([]);
+                }
+              };
+              progressImg.src = data.currentCanvas;
+            }, 0);
+          };
+          img.src = data.originalImage;
+        } catch (error) {
+          alert(this.currentLanguage() === 'vi' ? 'Lỗi khi đọc file tiến độ!' : 'Error reading progress file!');
+        }
+      };
+      reader.readAsText(file);
+    }
+    input.value = '';
+  }
+
   private processImage(img: HTMLImageElement) {
     const canvas = document.createElement('canvas');
     canvas.width = img.width;
