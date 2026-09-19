@@ -3,6 +3,14 @@
     <h1>{{ currentLanguage() === 'vi' ? 'Màu Sắc' : 'Colors' }}</h1>
     
     <div style="position: absolute; right: 0; top: 0; display: flex; gap: 10px; align-items: center; padding: 10px;">
+      
+      <label for="headerSingleUpload" class="icon-btn"
+        style="padding: 8px; border-radius: 50%; border: 2px solid #3b82f6; background: white; color: #3b82f6; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: 1.2rem; margin: 0; transition: all 0.2s;"
+        [title]="currentLanguage() === 'vi' ? 'Tải ảnh mới / Đổi ảnh' : 'Upload Image'">
+        📁
+      </label>
+      <input type="file" id="headerSingleUpload" accept="image/*" (change)="onSingleUpload($event)" hidden>
+
       <button class="icon-btn" (click)="exportProgress()" *ngIf="hasCanvasImage()"
         style="padding: 8px; border-radius: 50%; border: 2px solid #10b981; background: white; color: #10b981; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: 1.2rem; transition: all 0.2s;"
         [title]="currentLanguage() === 'vi' ? 'Lưu tiến độ' : 'Save Progress'">
@@ -58,15 +66,9 @@
 
         <div *ngIf="!hasCanvasImage()" class="main-upload-section" style="text-align: center; padding: 3rem 0;">
           <p style="margin-bottom: 2rem; color: #4b5563;">
-            {{ currentLanguage() === 'vi' ? 'Hệ thống sẽ tự động tạo hình nét và trích xuất bảng màu từ ảnh của bạn!' :
-            'System will automatically generate line art and extract colors from your image!' }}
+            {{ currentLanguage() === 'vi' ? 'Hệ thống sẽ tự động tạo hình nét và trích xuất bảng màu từ ảnh của bạn! Vui lòng bấm vào nút thư mục (📁) góc trên bên phải để bắt đầu.' :
+            'System will automatically generate line art and extract colors from your image! Please click the folder icon (📁) at the top right to start.' }}
           </p>
-          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <label for="singleUpload" class="upload-btn" style="font-size: 1.2rem; padding: 1rem 2rem;">
-              📁 {{ currentLanguage() === 'vi' ? 'Tải ảnh mới' : 'New Image' }}
-            </label>
-          </div>
-          <input type="file" id="singleUpload" accept="image/*" (change)="onSingleUpload($event)" hidden>
         </div>
       </div>
 
@@ -79,12 +81,6 @@
           ↩️ {{ currentLanguage() === 'vi' ? 'Hoàn tác' : 'Undo' }}
         </button>
 
-        <button class="change-img-btn" (click)="triggerUpload()"
-          style="padding: 0.5rem 1.5rem; border-radius: 99px; font-weight: bold; cursor: pointer; border: none; background: #4f46e5; color: white; transition: all 0.2s;">
-          📷 {{ currentLanguage() === 'vi' ? 'Đổi ảnh khác' : 'Change Image' }}
-        </button>
-        <!-- Nút này được kích hoạt qua TS thay vì label -->
-        <input type="file" #fileInput accept="image/*" (change)="onSingleUpload($event)" hidden>
       </div>
 
       <p class="instruction" *ngIf="hasCanvasImage() && !selectedColor()">
