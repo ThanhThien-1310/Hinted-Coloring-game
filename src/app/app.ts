@@ -907,11 +907,36 @@ export class App implements OnInit, OnDestroy {
     const canvas = this.canvasRef.nativeElement;
     const rect = canvas.getBoundingClientRect();
 
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
 
-    const x = Math.floor((event.clientX - rect.left) * scaleX);
-    const y = Math.floor((event.clientY - rect.top) * scaleY);
+    // Tính toán tỷ lệ scale thật của canvas khi dùng object-fit: contain
+    const elementWidth = rect.width;
+    const elementHeight = rect.height;
+    
+    const scaleX = elementWidth / canvasWidth;
+    const scaleY = elementHeight / canvasHeight;
+    const scale = Math.min(scaleX, scaleY); // object-fit: contain dùng scale nhỏ nhất
+
+    const renderedWidth = canvasWidth * scale;
+    const renderedHeight = canvasHeight * scale;
+
+    // Khoảng trống (letterbox) được canh giữa
+    const offsetX = (elementWidth - renderedWidth) / 2;
+    const offsetY = (elementHeight - renderedHeight) / 2;
+
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    // Bỏ qua nếu click ra ngoài vùng hình ảnh
+    if (mouseX < offsetX || mouseX > offsetX + renderedWidth ||
+        mouseY < offsetY || mouseY > offsetY + renderedHeight) {
+      return;
+    }
+
+    // Tọa độ thực trên canvas
+    const x = Math.floor((mouseX - offsetX) / scale);
+    const y = Math.floor((mouseY - offsetY) / scale);
 
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (ctx) {
