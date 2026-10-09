@@ -1,133 +1,125 @@
-<main class="app-container">
-  <header class="app-header">
-    <h1>{{ currentLanguage() === 'vi' ? 'Màu Sắc' : 'Colors' }}</h1>
+<main class="kid-app-container">
+  <!-- Bầu trời và mây background -->
+  <div class="clouds"></div>
+
+  <header class="kid-header">
+    <div class="logo-area">
+      <h1>🌈 {{ currentLanguage() === 'vi' ? 'Sắc Màu Toán Học' : 'Math Coloring' }} 🎨</h1>
+    </div>
     
     <div class="header-actions">
-      
-      <label for="headerSingleUpload" class="icon-btn"
-        style="padding: 8px; border-radius: 50%; border: 2px solid #3b82f6; background: white; color: #3b82f6; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: 1.2rem; margin: 0; transition: all 0.2s;"
-        [title]="currentLanguage() === 'vi' ? 'Tải ảnh mới / Đổi ảnh' : 'Upload Image'">
-        📁
+      <!-- Grade selector -->
+      <div class="grade-toggle">
+        <button class="grade-btn" [class.active]="currentGrade() === '1-2'" (click)="setGrade('1-2')">
+          {{ currentLanguage() === 'vi' ? 'Lớp 1-2' : 'Grades 1-2' }}
+        </button>
+        <button class="grade-btn" [class.active]="currentGrade() === '3-5'" (click)="setGrade('3-5')">
+          {{ currentLanguage() === 'vi' ? 'Lớp 3-5' : 'Grades 3-5' }}
+        </button>
+      </div>
+
+      <!-- Upload Button -->
+      <label for="headerSingleUpload" class="action-btn upload-btn"
+        [title]="currentLanguage() === 'vi' ? 'Tải ảnh mới' : 'Upload Image'">
+        <span class="icon">🖼️</span>
+        <span class="text">{{ currentLanguage() === 'vi' ? 'Chọn Ảnh Mới' : 'New Image' }}</span>
       </label>
       <input type="file" id="headerSingleUpload" accept="image/*" (change)="onSingleUpload($event)" hidden>
 
-      <button class="icon-btn" (click)="exportProgress()" *ngIf="hasCanvasImage()"
-        style="padding: 8px; border-radius: 50%; border: 2px solid #10b981; background: white; color: #10b981; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: 1.2rem; transition: all 0.2s;"
-        [title]="currentLanguage() === 'vi' ? 'Lưu tiến độ' : 'Save Progress'">
-        💾
+      <!-- Audio Toggle -->
+      <button class="action-btn audio-btn" (click)="toggleAudio()">
+        <span class="icon">{{ audioEnabled() ? '🔊' : '🔇' }}</span>
+        <span class="text">{{ currentLanguage() === 'vi' ? (audioEnabled() ? 'Bật Âm' : 'Tắt Âm') : (audioEnabled() ? 'Sound On' : 'Sound Off') }}</span>
       </button>
-      
-      <label for="headerImportUpload" class="icon-btn"
-        style="padding: 8px; border-radius: 50%; border: 2px solid #f59e0b; background: white; color: #f59e0b; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; font-size: 1.2rem; margin: 0; transition: all 0.2s;"
-        [title]="currentLanguage() === 'vi' ? 'Nhập tiến độ' : 'Import Progress'">
-        📥
+
+      <!-- Save / Export Progress -->
+      <button class="action-btn save-btn" (click)="exportProgress()" *ngIf="hasCanvasImage()"
+        [title]="currentLanguage() === 'vi' ? 'Lưu tiến độ' : 'Save Progress'">
+        <span class="icon">💾</span>
+      </button>
+
+      <!-- Load / Import Progress -->
+      <label for="headerImportUpload" class="action-btn load-btn"
+        [title]="currentLanguage() === 'vi' ? 'Nhập tiến độ' : 'Load Progress'">
+        <span class="icon">📥</span>
       </label>
       <input type="file" id="headerImportUpload" accept=".json" (change)="onImportProgress($event)" hidden>
 
-      <button class="lang-toggle-btn" (click)="toggleLanguage()"
-        style="padding: 8px 16px; border-radius: 99px; border: 2px solid #4f46e5; background: white; color: #4f46e5; font-weight: bold; cursor: pointer;">
-        {{ currentLanguage() === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English' }}
+      <!-- Ngôn ngữ -->
+      <button class="action-btn lang-btn" (click)="toggleLanguage()">
+        <span class="icon">{{ currentLanguage() === 'vi' ? '🇻🇳' : '🇬🇧' }}</span>
       </button>
     </div>
   </header>
 
-  <div class="game-board">
-
-    <!-- Cột trái: Bộ màu chuẩn -->
-    <section class="color-palette">
-      <h2>{{ currentLanguage() === 'vi' ? 'Khung nhóm màu' : 'Color Palette' }}</h2>
-      <div class="colors-grid" *ngIf="colors.length > 0">
-        <button *ngFor="let color of colors" class="color-btn" [style.backgroundColor]="color.hexCode"
-          [class.selected]="selectedColor()?.id === color.id" (click)="selectColor(color)"
-          [attr.aria-label]="currentLanguage() === 'vi' ? color.nameVi : color.nameEn">
-        </button>
-      </div>
-      <div *ngIf="colors.length === 0" class="empty-palette-text"
-        style="color: #9ca3af; text-align: center; font-style: italic;">
-        {{ currentLanguage() === 'vi' ? 'Bảng màu sẽ tự động tạo khi bạn tải ảnh lên.' : 'Colors will be generated when
-        you upload an image.' }}
-      </div>
-    </section>
-
-    <!-- Cột giữa: Hình nét (Canvas) -->
-    <section class="line-art-area">
-      <h2>{{ currentLanguage() === 'vi' ? 'Hình nét' : 'Line Art' }}</h2>
-
-      <div class="canvas-container">
-        <!-- HTML5 Canvas thay cho SVG -->
-        <div class="canvas-wrapper" style="position: relative; display: inline-block;">
-          <!-- Bàn tay gợi ý (Idle Hint) -->
-          <div class="hint-hand" *ngIf="hintActive()" [style.left.%]="hintX()" [style.top.%]="hintY()">
-            👆
-          </div>
-          <canvas #coloringCanvas class="coloring-canvas" (click)="onCanvasClick($event)"
-            [style.display]="hasCanvasImage() ? 'block' : 'none'"></canvas>
-        </div>
-
-        <div *ngIf="!hasCanvasImage()" class="main-upload-section" style="text-align: center; padding: 3rem 0;">
-          <p style="margin-bottom: 2rem; color: #4b5563;">
-            {{ currentLanguage() === 'vi' ? 'Hệ thống sẽ tự động tạo hình nét và trích xuất bảng màu từ ảnh của bạn! Vui lòng bấm vào nút thư mục (📁) góc trên bên phải để bắt đầu.' :
-            'System will automatically generate line art and extract colors from your image! Please click the folder icon (📁) at the top right to start.' }}
-          </p>
-        </div>
-      </div>
-
-      <div class="action-bar" *ngIf="hasCanvasImage()"
-        style="margin-top: 1rem; text-align: center; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-        <button class="undo-btn" (click)="undo()" [disabled]="history().length === 0"
-          style="padding: 0.5rem 1.5rem; border-radius: 99px; font-weight: bold; cursor: pointer; border: none; background: #e5e7eb; color: #4b5563; transition: all 0.2s;"
-          [style.opacity]="history().length === 0 ? '0.5' : '1'"
-          [style.cursor]="history().length === 0 ? 'not-allowed' : 'pointer'">
-          ↩️ {{ currentLanguage() === 'vi' ? 'Hoàn tác' : 'Undo' }}
-        </button>
-
-      </div>
-
-      <p class="instruction" *ngIf="hasCanvasImage() && !selectedColor()">
-        {{ currentLanguage() === 'vi' ? 'Vui lòng chọn một màu bên trái!' : 'Please pick a color on the left!' }}
-      </p>
-      <p class="instruction active" *ngIf="selectedColor()">
-        {{ currentLanguage() === 'vi' ? 'Bạn đã chọn: ' : 'You picked: ' }}
-        <strong>{{ currentLanguage() === 'vi' ? selectedColor()?.nameVi : selectedColor()?.nameEn }}</strong>.
-        {{ currentLanguage() === 'vi' ? 'Hãy click vào hình để tô màu!' : 'Click the drawing to color it!' }}
-      </p>
-    </section>
-
-    <!-- Cột phải: Hình mẫu -->
-    <section class="sample-image-area">
-      <h2>{{ currentLanguage() === 'vi' ? 'Hình mẫu' : 'Sample' }}</h2>
-
-      <div class="sample-container">
-        <img *ngIf="sampleImageUrl()" [src]="sampleImageUrl()" alt="Hình mẫu" class="uploaded-sample">
-
-        <div *ngIf="!sampleImageUrl()" class="empty-sample-text">
-          <p>{{ currentLanguage() === 'vi' ? 'Hình mẫu sẽ xuất hiện ở đây sau khi tải lên.' : 'Sample image will appear
-            here after upload.' }}</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Popup chúc mừng -->
-    <div class="completion-popup-overlay" *ngIf="isCompleted()"
-      style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px);">
-      <div class="completion-popup"
-        style="background: white; padding: 3rem 4rem; border-radius: 1.5rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-        <h2 style="font-size: 2.5rem; color: #4f46e5; margin-bottom: 1rem; margin-top: 0;">🎉 {{ currentLanguage() === 'vi' ? 'Chúc mừng!' : 'Congratulations!' }} 🎉</h2>
-        <p style="font-size: 1.2rem; color: #4b5563; margin-bottom: 2rem;">
-          {{ currentLanguage() === 'vi' ? 'Bạn đã hoàn thành xuất sắc bức tranh tuyệt đẹp này!' : 'You have successfully colored this beautiful picture!' }}
-        </p>
-        <button (click)="isCompleted.set(false)"
-          style="padding: 0.75rem 2.5rem; border-radius: 99px; background: #4f46e5; color: white; border: none; font-weight: bold; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);">
-          {{ currentLanguage() === 'vi' ? 'Chơi tiếp' : 'Continue' }}
-        </button>
-      </div>
+  <!-- Storytelling Banner -->
+  <div class="storytelling-banner" *ngIf="hasCanvasImage()">
+    <div class="mascot-container">
+      <div class="mascot">🐶</div>
+    </div>
+    <div class="speech-bubble">
+      <p>{{ currentLanguage() === 'vi' ? aiMessageVi() : aiMessageEn() }}</p>
     </div>
   </div>
-</main>
 
-<style>
-@keyframes popIn {
-  0% { transform: scale(0.5); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
-</style>
+  <div class="kid-game-board" [class.centered-layout]="!hasCanvasImage()">
+    <!-- Center Column: Canvas -->
+    <section class="kid-panel drawing-panel">
+      <div class="canvas-wrapper">
+        <div *ngIf="!hasCanvasImage()" class="welcome-box">
+          <div class="welcome-mascot">🐶</div>
+          <h3>{{ currentLanguage() === 'vi' ? 'Xin chào!' : 'Hello there!' }}</h3>
+          <p>{{ currentLanguage() === 'vi' ? 'Hãy bấm nút Chọn Ảnh Mới ở trên để bắt đầu nhé!' : 'Click New Image above to start!' }}</p>
+        </div>
+
+        <canvas #coloringCanvas class="coloring-canvas" 
+          (click)="onCanvasClick($event)"
+          (mousemove)="onCanvasMouseMove($event)"
+          (mouseleave)="onCanvasMouseLeave()"
+          [style.display]="hasCanvasImage() ? 'block' : 'none'"></canvas>
+      </div>
+
+      <div class="action-bar" *ngIf="hasCanvasImage()">
+        <button class="action-btn undo-btn" (click)="undo()" [disabled]="history().length === 0">
+          <span class="icon">↩️</span>
+          <span class="text">{{ currentLanguage() === 'vi' ? 'Quay lại' : 'Undo' }}</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Right Column: Vertical Bottles Tray -->
+    <section class="kid-panel side-tray" *ngIf="hasCanvasImage() && bottles().length > 0 && !isCompleted()">
+      <div class="tray-container">
+        <button *ngFor="let bottle of bottles()" 
+          class="bottle-btn" 
+          [class.selected]="selectedColor()?.id === bottle.colorId"
+          (click)="selectColor({id: bottle.colorId, nameVi: bottle.nameVi, nameEn: bottle.nameEn, hexCode: bottle.hexCode})"
+          [attr.aria-label]="currentLanguage() === 'vi' ? bottle.nameVi : bottle.nameEn">
+          <div class="bottle-math-label">{{ bottle.mathProblem.expression }}</div>
+          <div class="bottle-graphic" [style.backgroundColor]="bottle.hexCode">
+            <div class="bottle-highlight"></div>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Right Column: Success Panel -->
+    <section class="kid-panel success-panel" *ngIf="isCompleted()">
+      <div class="success-content">
+        <div class="confetti">🎊🎉🎊</div>
+        <h2>{{ currentLanguage() === 'vi' ? 'Tuyệt Vời!' : 'Great Job!' }}</h2>
+        <p>{{ currentLanguage() === 'vi' ? 'Bức tranh của bé thật là đẹp!' : 'Your painting is so beautiful!' }}</p>
+        <div class="popup-mascot">🐶</div>
+        
+        <div class="success-actions">
+          <label for="headerSingleUpload" class="action-btn upload-btn huge-btn">
+            <span class="icon">🖼️</span>
+            <span class="text">{{ currentLanguage() === 'vi' ? 'Thử thách mới' : 'New Challenge' }}</span>
+          </label>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+</main>
